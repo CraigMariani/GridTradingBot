@@ -1,0 +1,14 @@
+Risk = ticks at risk * tick value * position size
+
+Risk should be no more than 10 percent of the account
+Say we have $1000 and we risk $100
+
+Use the exmple below to calculate position size 
+Position size is how we manage our risk 
+We have five grid lines with a stop loss below the 5th line 
+This means we have a stop loss at this percentage
+
+100 = 600 * 1 * position_size
+
+total position size = 0.166
+
