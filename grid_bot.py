@@ -1,10 +1,6 @@
 import alpaca_trade_api as tradeapi
-from more_itertools import first
 from stream_data import Stream_Data as stream
 from secret import Secret
-import numpy as np
-import pandas as pd
-from pprint import pprint
 from rules import Rules
 
 
@@ -70,7 +66,7 @@ class Bot:
         s = stream()
         bars = s.bar_data()
 
-        # initial buy 
+        
         for _ in range(3):
             print(next(bars))
 
@@ -85,7 +81,9 @@ class Bot:
         print('position_size {}'.format(position_size))
 
         # the amount of the position we buy or sell off at each line
-        partial_position = position_size / 7
+        partial_position = position_size / 5
+
+        # inital buy order
         print('First Purchase of {} at {}'.format(position_size, first_close))
         api.submit_order(
             symbol='ETHUSD',

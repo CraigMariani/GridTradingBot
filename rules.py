@@ -11,7 +11,7 @@ class Rules:
 
     def __init__(self, current_price) -> None:
         self.line_count = 5
-        self.grid_space = 100
+        self.grid_space = 75
         self.current_price = current_price
     
     def calculate_grid_lines(self):

@@ -1,7 +1,6 @@
 from websocket import create_connection
 import simplejson as json
 from secret import Secret
-import pandas as pd
 
 
 class Stream_Data:
