@@ -1,3 +1,0 @@
-websocket==0.2.1
-alpaca-trade-api==1.4.3
-jsonschema==3.2.0
