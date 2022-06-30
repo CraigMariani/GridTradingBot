@@ -11,7 +11,7 @@ class Rules:
 
     def __init__(self, current_price) -> None:
         self.line_count = 5
-        self.grid_space = 75
+        self.grid_space = 50
         self.current_price = current_price
     
     def calculate_grid_lines(self):
@@ -24,8 +24,14 @@ class Rules:
         buy_lines = []
         sell_lines = []
         for i in range(line_count):
-            buy_lines.append(price - ((line_count * grid_space)))
-            sell_lines.append(price + ((line_count * grid_space)))
+            buy_lines.append(price - ((i * grid_space)))
+            sell_lines.append(price + ((i * grid_space)))
+        
+        print('sl {}'.format(stop_loss))
+        print('tp {}'.format(take_profit))
+        print('bl {}'.format(buy_lines))
+        print('sl {}'.format(sell_lines))
+        
         return stop_loss, take_profit, buy_lines, sell_lines
 
 

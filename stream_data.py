@@ -29,4 +29,6 @@ class Stream_Data:
             yield data[0]
             # print(data)
 
-    
+s = Stream_Data()
+data = s.bar_data
+print(data)

@@ -74,7 +74,7 @@ class Bot:
         r = Rules(first_close)
 
         account = api.get_account()
-        available_funds = int(account.buying_power)
+        available_funds = int(round(float(account.buying_power), 2))
         print(available_funds)
         # position size is the total amount of our account that we are risking
         position_size = r.calculate_position_size(account_size=available_funds)
@@ -91,7 +91,7 @@ class Bot:
             type='market',
             qty=position_size,
         )
-
+        # print('order executed')
         # set up grid lines
         stop_loss, take_profit, buy_lines, sell_lines = r.calculate_grid_lines()
 
