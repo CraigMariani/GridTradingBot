@@ -1,43 +1,19 @@
+'''
+For cron job this will be used every time we are entering trades
+
+
+crontab -e
+select 1 (nano) 
+0 */1 * * * (run every hour)
+
+'''
 import alpaca_trade_api as tradeapi
 from stream_data import Stream_Data as stream
 from secret import Secret
 from rules import Rules
+from subprocess import call
 
-
-'''
-Algorithm
-Inital Set Up
-    -Buy at the current price
-    -Set the grid lines (5 above, 5 below)
-    -Set stop loss (exit all positions at a loss, this will be below the 5th lowest level)
-    -Set take profit (exit all position at a profit, this will be above the 5th highest level) 
-
-Running 
-    -price hits the grid lines above it will sell one fifth of the current position
-    -price hits the grid lines below it will buy one fifth of the current position
-    -hit stop loss we exit all positions at a loss
-    -hit take profit we exit all positions at a profit
-    -After tp/sl is hit we go back to initial set up
-
-
-Example Output:
-{'S': 'BTCUSD',
- 'T': 'b',
- 'c': 29466.03,
- 'h': 29474.04,
- 'l': 29464.84,
- 'n': 149,
- 'o': 29472.95,
- 't': '2022-05-22T01:59:00Z',
- 'v': 2.15212065,
- 'vw': 29468.8181816825,
- 'x': 'CBSE'}
-'''
-
-
-
-class Bot:
-
+class Run:
     def __init__(self):
         api_key = Secret.paper_api_key
         secret_key = Secret.paper_secret_key
@@ -61,18 +37,17 @@ class Bot:
         balance_change = float(account.equity) - float(account.last_equity)
         print(f'Today\'s portfolio balance change: ${balance_change}')
 
-    def start_bot(self):
-        api = self.api
+    def main(self):
         s = stream()
-        bars = s.bar_data()
 
-        
+        api = self.api
+        bars = s.bar_data()
         for _ in range(3):
             print(next(bars))
-
+        
         first_close = next(bars)['c']
         r = Rules(first_close)
-
+        stop_loss, take_profit, buy_lines, sell_lines = r.calculate_grid_lines()
         account = api.get_account()
         available_funds = int(round(float(account.buying_power), 2))
         print(available_funds)
@@ -82,18 +57,6 @@ class Bot:
 
         # the amount of the position we buy or sell off at each line
         partial_position = position_size / 5
-
-        # inital buy order
-        print('First Purchase of {} at {}'.format(position_size, first_close))
-        api.submit_order(
-            symbol='ETHUSD',
-            side='buy',
-            type='market',
-            qty=position_size,
-        )
-        # print('order executed')
-        # set up grid lines
-        stop_loss, take_profit, buy_lines, sell_lines = r.calculate_grid_lines()
 
         for bar in bars:
             close = bar['c']
@@ -117,16 +80,17 @@ class Bot:
             if take_profit == close:
                 print('exit all positions at profit')
                 api.close_all_positions()
-                b.current_profit_loss()
-                b.start_bot()
+                ru.current_profit_loss()
+                call(["python3", "start.py"])
 
             if stop_loss == close:
                 print('exit all positions at a loss')
                 api.close_all_positions()
-                b.current_profit_loss()
-                b.start_bot()
+                ru.current_profit_loss()
+                call(["python3", "start.py"])
+                
 
 
 if __name__ == '__main__':
-    b = Bot()
-    b.start_bot()
+    ru = Run()
+    ru.main()
