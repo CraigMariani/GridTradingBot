@@ -64,13 +64,11 @@ class Run:
 
         # get the current time in PST
         PST_tz = timezone(timedelta(hours=-8))
-        
-        current_position = []
 
         for bar in bars:
             close = bar['c']
             print('close: {}'.format(close))
-            # print('bar: {}'.format(bar))
+            print('bar: {}'.format(bar))
             print('buy_lines {}'.format(buy_lines))
             print('sell_lines {}'.format(sell_lines))
 
@@ -80,48 +78,31 @@ class Run:
             # we might need to see where the buy and sell lines are in relation to closing price
             # right now the lines are more focused if the price hits it, price may never be the exact same 
             # as those lines, use a greater/less than or equal to in order to catch these movements  
-            for i in range(1, len(buy_lines)):
-                # price is in between these buy lines we buy 
-                if close <= buy_lines[i-1] and close >= buy_lines[i]:
-                    if buy_lines[i-1] in current_position and buy_lines[i] in current_position:
-                        print('already bought')
-                        break
-                    current_position.clear()
-                    current_position.append(buy_lines[i])
-                    current_position.append(buy_lines[i-1])
-                    
-                    print('Long ETHUSD {} : {}'.format(partial_position, datetime.now(PST_tz)))
-                    api.submit_order(
-                       symbol='ETHUSD',
-                       side='buy',
-                       type='market',
-                       qty=partial_position,
-                     )
-            for i in range(1, len(sell_lines)):
-                # price is in between these sell lines we sell
-                if close >= sell_lines[i-1] and close <= sell_lines[i]:
-                    if sell_lines[i-1] in current_position and sell_lines[i]:
-                        print('already sold')
-                        break
-                    current_position.clear()
-                    current_position.append(sell_lines[i])
-                    current_position.append(sell_lines[i-1])
+            if close in buy_lines:
+                print('Long ETHUSD {} : {}'.format(partial_position, datetime.now(PST_tz)))
+                api.submit_order(
+                    symbol='ETHUSD',
+                    side='buy',
+                    type='market',
+                    qty=partial_position,
+                )
 
-                    print('Short ETHUSD {} : {}'.format(partial_position, datetime.now(PST_tz)))
-                    api.submit_order(
-                        symbol='ETHUSD',
-                        side='sell',
-                        type='market',
-                        qty=partial_position,
-                    )
+            if close in sell_lines:
+                print('Short ETHUSD {} : {}'.format(partial_position, datetime.now(PST_tz)))
+                api.submit_order(
+                    symbol='ETHUSD',
+                    side='sell',
+                    type='market',
+                    qty=partial_position,
+                )
 
-            if close >= take_profit:
+            if take_profit == close:
                 print('exit all positions at profit')
                 api.close_all_positions()
                 ru.current_profit_loss()
                 call(["python3", "start.py"])
 
-            if close <= stop_loss:
+            if stop_loss == close:
                 print('exit all positions at a loss')
                 api.close_all_positions()
                 ru.current_profit_loss()
